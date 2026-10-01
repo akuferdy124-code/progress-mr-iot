@@ -70,13 +70,13 @@ body {
 .animate-marquee {
   display: flex;
   width: max-content;
-  animation: marquee 35s linear infinite;
+  animation: marquee 25s linear infinite;
 }
 
 .animate-marquee-reverse {
   display: flex;
   width: max-content;
-  animation: marquee-reverse 45s linear infinite;
+  animation: marquee-reverse 28s linear infinite;
 }
 
 @keyframes fadeIn {

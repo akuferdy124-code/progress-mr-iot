@@ -17,7 +17,7 @@ export const HeroSection = () => {
           <span className="font-mono text-[10px] sm:text-xs uppercase tracking-[0.25em] text-white/50 border border-white/10 px-4 py-1.5 rounded-full mb-3 inline-block">
             Electronics Engineer · Robotics & Embedded
           </span>
-          <h1 className="font-black uppercase tracking-tight leading-none whitespace-nowrap block text-[11vw] sm:text-[11.5vw] md:text-[12.5vw] text-white drop-shadow-sm select-none">
+          <h1 className="font-black uppercase tracking-tight leading-none whitespace-nowrap block text-[8.2vw] sm:text-[8.5vw] md:text-[9vw] lg:text-[8.8vw] text-white drop-shadow-sm select-none">
             Ferdy Fernando
           </h1>
           <p className="text-[#D7E2EA] font-light uppercase tracking-[0.2em] text-[clamp(0.65rem,1.1vw,0.9rem)] mt-3 opacity-60">
