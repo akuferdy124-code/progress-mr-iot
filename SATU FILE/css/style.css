@@ -1,0 +1,56 @@
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body,#root{background:#0C0C0C}
+body{font-family:'Kanit',sans-serif;-webkit-font-smoothing:antialiased;overflow-x:clip}
+.hero-heading{background:linear-gradient(180deg,#646973 0%,#BBCCD7 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.hero-blue-title{background:linear-gradient(180deg,#3b82f6 0%,#1d4ed8 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+/* Lightning & Space Canvas Loading */
+#loader-container {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #050505;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1), visibility 0.9s;
+}
+
+#loader-container.fade-out {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.lightning-glow {
+  text-shadow: 0 0 18px rgba(255,255,255,0.7), 0 0 36px rgba(255,255,255,0.35), 0 0 60px rgba(255,255,255,0.15);
+}
+#loaderBar{
+  transition: width 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* GLOBAL LIFT-UP INTERACTION */
+.btn-interactive, 
+button[onclick], 
+a.rounded-full, 
+nav a, 
+.group.rounded-3xl, 
+#marqueeRow1 > div {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.btn-interactive:hover,
+button[onclick]:hover,
+a.rounded-full:hover,
+nav a:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 28px -6px rgba(255, 255, 255, 0.18);
+}
+
+.btn-interactive:active,
+button[onclick]:active,
+a.rounded-full:active,
+nav a:active {
+  transform: translateY(-1px) scale(0.98);
+}

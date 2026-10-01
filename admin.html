@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin HP — Ferdy Fernando</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={theme:{extend:{fontFamily:{kanit:['Kanit','sans-serif']}}}}</script>
+<style>body{font-family:'Kanit',sans-serif}</style>
+</head>
+<body class="bg-[#0C0C0C] text-[#D7E2EA] min-h-screen">
+<div id="loginView" class="min-h-screen flex items-center justify-center p-6">
+  <div class="w-full max-w-sm bg-[#121622] border border-white/10 rounded-3xl p-8">
+    <h1 class="text-2xl font-black uppercase tracking-tight">🔒 Admin HP</h1>
+    <p class="text-xs text-white/50 mt-1">Kelola Proyek / Jurnal / Skills dari HP — realtime, tanpa edit kode</p>
+    <input id="passInput" type="password" placeholder="Kata sandi" class="mt-6 w-full rounded-xl bg-black/40 border border-white/10 px-4 py-3 text-sm outline-none focus:border-white">
+    <button onclick="doLogin()" class="mt-3 w-full rounded-xl bg-white text-black py-3 text-sm font-black uppercase tracking-widest">Masuk</button>
+    <p id="loginErr" class="text-xs text-red-400 mt-2 hidden">Sandi salah.</p>
+    <a href="index.html" class="block text-center text-xs text-white/40 mt-3 hover:text-white">← Kembali</a>
+  </div>
+</div>
+
+<div id="adminView" class="hidden">
+  <header class="sticky top-0 z-30 bg-[#0C0C0C]/90 backdrop-blur border-b border-white/10 px-4 sm:px-6 py-4 flex items-center justify-between">
+    <h1 class="font-black uppercase text-lg">Admin Panel</h1>
+    <div class="flex gap-2">
+      <a href="index.html" class="text-xs px-3 py-2 rounded-full border border-white/20">Lihat Web</a>
+      <button onclick="doLogout()" class="text-xs px-3 py-2 rounded-full bg-white text-black font-black">Logout</button>
+    </div>
+  </header>
+
+  <div class="max-w-5xl mx-auto p-4 sm:p-6">
+    <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+      <button onclick="switchTab('projek')" id="tab-projek" class="tab-btn px-4 py-2 rounded-full text-xs font-black uppercase bg-white text-black whitespace-nowrap">Etalase Proyek</button>
+      <button onclick="switchTab('jurnal')" id="tab-jurnal" class="tab-btn px-4 py-2 rounded-full text-xs font-black uppercase bg-white/10 whitespace-nowrap">Jurnal</button>
+      <button onclick="switchTab('skills')" id="tab-skills" class="tab-btn px-4 py-2 rounded-full text-xs font-black uppercase bg-white/10 whitespace-nowrap">Skills</button>
+      <button onclick="switchTab('setting')" id="tab-setting" class="tab-btn px-4 py-2 rounded-full text-xs font-black uppercase bg-white/10 whitespace-nowrap">Sandi</button>
+    </div>
+
+    <div id="panel-projek" class="space-y-4">
+      <div class="bg-[#121622] border border-white/10 rounded-2xl p-5">
+        <h2 class="font-black uppercase text-sm">Tambah / Edit Proyek</h2>
+        <input type="hidden" id="pEditId">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+          <input id="pTitle" placeholder="Judul Proyek" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+          <input id="pCategory" placeholder="Kategori" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+          <input id="pStatus" placeholder="Status" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+          <input id="pTech" placeholder="Teknologi koma (ESP32, PID)" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+          <input id="pDrive" placeholder="Link Google Drive" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm sm:col-span-2">
+          <textarea id="pDesc" placeholder="Deskripsi" rows="2" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm sm:col-span-2"></textarea>
+          <textarea id="pProblem" placeholder="Masalah" rows="2" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm"></textarea>
+          <textarea id="pResult" placeholder="Hasil" rows="2" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm"></textarea>
+        </div>
+        <label class="text-xs text-white/50 mt-3 block">Foto Proyek (bisa banyak, dari HP)</label>
+        <input id="pFiles" type="file" accept="image/*" multiple class="w-full text-xs mt-1">
+        <div id="pPreview" class="flex gap-2 flex-wrap mt-2"></div>
+        <div class="flex gap-2 mt-4">
+          <button onclick="saveProject()" class="px-6 py-2.5 rounded-xl bg-white text-black text-sm font-black">Simpan Proyek</button>
+          <button onclick="clearProjectForm()" class="px-4 py-2.5 rounded-xl bg-white/10 text-xs">Batal / Baru</button>
+        </div>
+      </div>
+      <div id="projekList" class="space-y-3"></div>
+    </div>
+
+    <div id="panel-jurnal" class="hidden space-y-4">
+      <div class="bg-[#121622] border border-white/10 rounded-2xl p-5">
+        <h2 class="font-black uppercase text-sm">Tambah / Edit Jurnal</h2>
+        <input type="hidden" id="jEditIdx">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+          <input id="jWeek" placeholder="Minggu (cth: Minggu 7)" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+          <input id="jDate" placeholder="Tanggal (cth: Minggu ke-7)" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+          <input id="jTitle" placeholder="Judul" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm sm:col-span-2">
+          <input id="jDrive" placeholder="Link Google Drive" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm sm:col-span-2">
+          <textarea id="jSummary" placeholder="Ringkasan" rows="2" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm sm:col-span-2"></textarea>
+          <textarea id="jProgress" placeholder="Progres" rows="2" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm"></textarea>
+          <textarea id="jResult" placeholder="Hasil" rows="2" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm"></textarea>
+        </div>
+        <input id="jFiles" type="file" accept="image/*" multiple class="w-full text-xs mt-3">
+        <div id="jPreview" class="flex gap-2 flex-wrap mt-2"></div>
+        <div class="flex gap-2 mt-4">
+          <button onclick="saveJournal()" class="px-6 py-2.5 rounded-xl bg-white text-black text-sm font-black">Simpan Jurnal</button>
+          <button onclick="clearJournalForm()" class="px-4 py-2.5 rounded-xl bg-white/10 text-xs">Batal / Baru</button>
+        </div>
+      </div>
+      <div id="jurnalList" class="space-y-3"></div>
+    </div>
+
+    <div id="panel-skills" class="hidden space-y-4">
+      <div class="bg-[#121622] border border-white/10 rounded-2xl p-5">
+        <h2 class="font-black uppercase text-sm">Kelola Skills</h2>
+        <p class="text-xs text-white/50">Tambah skill baru tinggal isi nama + URL icon — langsung tampil.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+          <input id="sName" placeholder="Nama Skill (cth: Arduino)" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+          <input id="sIcon" placeholder="URL Icon (kosongkan = auto)" class="rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button onclick="addSkill()" class="px-6 py-2.5 rounded-xl bg-white text-black text-sm font-black">Tambah Skill</button>
+          <button onclick="resetSkills()" class="px-4 py-2.5 rounded-xl bg-white/10 text-xs">Reset Default (9)</button>
+        </div>
+      </div>
+      <div id="skillsListAdmin" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+    </div>
+
+    <div id="panel-setting" class="hidden space-y-4">
+      <div class="bg-[#121622] border border-white/10 rounded-2xl p-5">
+        <h2 class="font-black uppercase text-sm">Ganti Kata Sandi</h2>
+        <input id="newPass" type="password" placeholder="Sandi baru" class="mt-3 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+        <input id="newPass2" type="password" placeholder="Ulangi sandi baru" class="mt-2 w-full rounded-xl bg-black/40 border border-white/10 px-3 py-2.5 text-sm">
+        <button onclick="changePass()" class="mt-3 px-6 py-2.5 rounded-xl bg-white text-black text-sm font-black">Ganti Sandi</button>
+        <p id="passMsg" class="text-xs mt-2 hidden"></p>
+        <div class="mt-6 pt-6 border-t border-white/10">
+          <h3 class="text-sm font-black text-red-400">Danger Zone</h3>
+          <button onclick="wipeAll()" class="mt-2 px-4 py-2 rounded-xl bg-red-600 text-xs font-black">Hapus Semua Data (Reset)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="data/projects.js"></script>
+<script>
+const PASS_KEY='ferdy_admin_pass';
+const AUTH_KEY='ferdy_admin_auth';
+function getPass(){ return localStorage.getItem(PASS_KEY) || '2411012007'; }
+function doLogin(){
+  const v=document.getElementById('passInput').value;
+  if(v===getPass()){ sessionStorage.setItem(AUTH_KEY,'1'); showAdmin(); }
+  else { document.getElementById('loginErr').classList.remove('hidden'); }
+}
+function doLogout(){ sessionStorage.removeItem(AUTH_KEY); location.reload(); }
+function showAdmin(){
+  document.getElementById('loginView').classList.add('hidden');
+  document.getElementById('adminView').classList.remove('hidden');
+  loadAll();
+}
+function checkAuth(){ if(sessionStorage.getItem(AUTH_KEY)==='1') showAdmin(); }
+function switchTab(t){
+  ['projek','jurnal','skills','setting'].forEach(x=>{
+    const p=document.getElementById('panel-'+x);
+    if(p) p.classList.toggle('hidden', x!==t);
+    const b=document.getElementById('tab-'+x);
+    if(b) b.className = x===t ? 'tab-btn px-4 py-2 rounded-full text-xs font-black uppercase bg-white text-black whitespace-nowrap' : 'tab-btn px-4 py-2 rounded-full text-xs font-black uppercase bg-white/10 whitespace-nowrap';
+  });
+}
+let pImagesTemp=[];
+let jImagesTemp=[];
+document.getElementById('pFiles')?.addEventListener('change', async e=>{
+  const files=[...e.target.files]; pImagesTemp=[];
+  for(const f of files){ pImagesTemp.push(await fileToDataURL(f)); }
+  renderTempPreview('pPreview', pImagesTemp);
+});
+document.getElementById('jFiles')?.addEventListener('change', async e=>{
+  const files=[...e.target.files]; jImagesTemp=[];
+  for(const f of files){ jImagesTemp.push(await fileToDataURL(f)); }
+  renderTempPreview('jPreview', jImagesTemp);
+});
+function renderTempPreview(id, arr){
+  const el=document.getElementById(id);
+  if(el) el.innerHTML=arr.map(u=>`<img src="${u}" class="w-20 h-20 object-cover rounded-xl border border-white/10">`).join('');
+}
+function fileToDataURL(f){ return new Promise(r=>{ const fr=new FileReader(); fr.onload=e=>r(e.target.result); fr.readAsDataURL(f); }); }
+
+function getProjects(){ try{ const s=localStorage.getItem('ferdy_projects_v2'); if(s) return JSON.parse(s);}catch(e){} return typeof projectsData!=='undefined'? JSON.parse(JSON.stringify(projectsData)):[]; }
+function saveProjects(arr){ localStorage.setItem('ferdy_projects_v2', JSON.stringify(arr)); }
+function getJournal(){ try{ const s=localStorage.getItem('ferdy_journal_v2'); if(s) return JSON.parse(s);}catch(e){} return typeof journalData!=='undefined'? JSON.parse(JSON.stringify(journalData)):[]; }
+function saveJournalArr(arr){ localStorage.setItem('ferdy_journal_v2', JSON.stringify(arr)); }
+function getSkills(){ try{ const s=localStorage.getItem('ferdy_skills_v2'); if(s) return JSON.parse(s);}catch(e){} if(typeof skillsList!=='undefined') return JSON.parse(JSON.stringify(skillsList)); return []; }
+function saveSkills(arr){ localStorage.setItem('ferdy_skills_v2', JSON.stringify(arr)); }
+
+function loadAll(){ renderProjek(); renderJurnal(); renderSkillsAdmin(); }
+
+function renderProjek(){
+  const arr=getProjects();
+  const el=document.getElementById('projekList');
+  if(!el) return;
+  el.innerHTML=arr.map((p,i)=>`
+    <div class="bg-[#121622] border border-white/10 rounded-2xl p-4 flex gap-4 items-start">
+      <img src="${(p.images&&p.images[0])||''}" class="w-20 h-20 object-cover rounded-xl shrink-0">
+      <div class="flex-1 min-w-0"><p class="text-xs text-white/50">${p.num} · ${p.category}</p><p class="font-black text-sm">${p.title}</p><p class="text-xs text-white/50 line-clamp-2">${p.desc||''}</p></div>
+      <div class="flex flex-col gap-1 shrink-0">
+        <button onclick="editProject(${i})" class="px-3 py-1.5 rounded-xl bg-white text-black text-xs font-black">Edit</button>
+        <button onclick="deleteProject(${i})" class="px-3 py-1.5 rounded-xl bg-red-500/20 text-red-400 text-xs">Hapus</button>
+      </div>
+    </div>
+  `).join('');
+}
+function editProject(i){
+  const p=getProjects()[i];
+  document.getElementById('pEditId').value=i;
+  document.getElementById('pTitle').value=p.title||'';
+  document.getElementById('pCategory').value=p.category||'';
+  document.getElementById('pStatus').value=p.status||'';
+  document.getElementById('pTech').value=(p.technologies||p.tech||[]).join(', ');
+  document.getElementById('pDrive').value=p.googleDrive||'';
+  document.getElementById('pDesc').value=p.desc||'';
+  document.getElementById('pProblem').value=p.problem||'';
+  document.getElementById('pResult').value=p.result||'';
+  pImagesTemp = p.images ? [...p.images] : [];
+  renderTempPreview('pPreview', pImagesTemp);
+  switchTab('projek'); window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteProject(i){
+  if(!confirm('Hapus proyek ini?')) return;
+  const arr=getProjects(); arr.splice(i,1);
+  saveProjects(arr); renderProjek();
+}
+function clearProjectForm(){
+  document.getElementById('pEditId').value='';
+  ['pTitle','pCategory','pStatus','pTech','pDrive','pDesc','pProblem','pResult'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+  pImagesTemp=[]; const pv=document.getElementById('pPreview'); if(pv) pv.innerHTML=''; const pf=document.getElementById('pFiles'); if(pf) pf.value='';
+}
+async function saveProject(){
+  const idx=document.getElementById('pEditId').value;
+  const title=document.getElementById('pTitle').value.trim();
+  if(!title) return alert('Judul wajib');
+  const arr=getProjects();
+  const tech=document.getElementById('pTech').value.split(',').map(s=>s.trim()).filter(Boolean);
+  const obj={
+    id: idx!=='' ? arr[idx].id : 'proj-'+Date.now(),
+    num: idx!=='' ? arr[idx].num : String(arr.length+1).padStart(2,'0'),
+    category: document.getElementById('pCategory').value.trim()||'-',
+    title,
+    desc: document.getElementById('pDesc').value.trim(),
+    technologies: tech, tech,
+    status: document.getElementById('pStatus').value.trim()||'Development',
+    problem: document.getElementById('pProblem').value.trim(),
+    objective: arr[idx!==''?idx:0]?.objective||'',
+    systemDesign: arr[idx!==''?idx:0]?.systemDesign||'',
+    hardware: arr[idx!==''?idx:0]?.hardware||[],
+    result: document.getElementById('pResult').value.trim(),
+    images: pImagesTemp.length? pImagesTemp : ['https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80'],
+    googleDrive: document.getElementById('pDrive').value.trim()||'MASUKKAN_LINK_GOOGLE_DRIVE_DI_SINI',
+    projectLink:''
+  };
+  if(idx!==''){ arr[idx]=obj; } else { arr.push(obj); }
+  saveProjects(arr); clearProjectForm(); renderProjek(); alert('Proyek disimpan ✓ — buka index.html lihat realtime');
+}
+
+function renderJurnal(){
+  const arr=getJournal();
+  const el=document.getElementById('jurnalList');
+  if(!el) return;
+  el.innerHTML=arr.map((j,i)=>`
+    <div class="bg-white text-black rounded-2xl p-4 flex gap-4 items-start">
+      <div class="font-black text-2xl">${String(i+1).padStart(2,'0')}</div>
+      <div class="flex-1 min-w-0"><p class="text-xs opacity-60">${j.week} — ${j.date}</p><p class="font-black text-sm">${j.title}</p></div>
+      <div class="flex flex-col gap-1 shrink-0">
+        <button onclick="editJournal(${i})" class="px-3 py-1.5 rounded-xl bg-black text-white text-xs font-black">Edit</button>
+        <button onclick="deleteJournal(${i})" class="px-3 py-1.5 rounded-xl bg-red-100 text-red-600 text-xs">Hapus</button>
+      </div>
+    </div>
+  `).join('');
+}
+function editJournal(i){
+  const j=getJournal()[i];
+  document.getElementById('jEditIdx').value=i;
+  document.getElementById('jWeek').value=j.week||'';
+  document.getElementById('jDate').value=j.date||'';
+  document.getElementById('jTitle').value=j.title||'';
+  document.getElementById('jSummary').value=j.summary||'';
+  document.getElementById('jProgress').value=j.progress||'';
+  document.getElementById('jResult').value=j.result||'';
+  document.getElementById('jDrive').value=j.googleDrive||'';
+  jImagesTemp=j.images?[...j.images]:[];
+  renderTempPreview('jPreview', jImagesTemp);
+  switchTab('jurnal'); window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteJournal(i){
+  if(!confirm('Hapus jurnal ini?')) return;
+  const arr=getJournal(); arr.splice(i,1); saveJournalArr(arr); renderJurnal();
+}
+function clearJournalForm(){
+  document.getElementById('jEditIdx').value='';
+  ['jWeek','jDate','jTitle','jSummary','jProgress','jResult','jDrive'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+  jImagesTemp=[]; const pv=document.getElementById('jPreview'); if(pv) pv.innerHTML=''; const jf=document.getElementById('jFiles'); if(jf) jf.value='';
+}
+function saveJournal(){
+  const idx=document.getElementById('jEditIdx').value;
+  const title=document.getElementById('jTitle').value.trim();
+  if(!title) return alert('Judul wajib');
+  const arr=getJournal();
+  const base = idx!=='' ? arr[idx] : {};
+  const obj={
+    week: document.getElementById('jWeek').value.trim()||'Minggu '+(arr.length+1),
+    title,
+    date: document.getElementById('jDate').value.trim()||'-',
+    summary: document.getElementById('jSummary').value.trim()||'-',
+    progress: document.getElementById('jProgress').value.trim()||'-',
+    challenges: base.challenges||'-',
+    result: document.getElementById('jResult').value.trim()||'-',
+    learning: base.learning||'-',
+    images: jImagesTemp.length? jImagesTemp : (base.images||['https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&q=80']),
+    googleDrive: document.getElementById('jDrive').value.trim()||'MASUKKAN_LINK_GOOGLE_DRIVE_DI_SINI'
+  };
+  if(idx!=='') arr[idx]=obj; else arr.push(obj);
+  saveJournalArr(arr); clearJournalForm(); renderJurnal(); alert('Jurnal disimpan ✓ — tanpa edit kode');
+}
+
+function renderSkillsAdmin(){
+  const arr=getSkills();
+  const el=document.getElementById('skillsListAdmin');
+  if(!el) return;
+  el.innerHTML=arr.map((s,i)=>`
+    <div class="bg-[#121622] border border-white/10 rounded-2xl p-3 flex items-center gap-3">
+      <img src="${s.icon}" class="w-10 h-10 object-contain bg-white rounded-lg p-1">
+      <p class="flex-1 text-xs font-black">${s.name}</p>
+      <button onclick="delSkill(${i})" class="px-2 py-1 rounded-lg bg-red-500/20 text-red-400 text-xs">Hapus</button>
+    </div>
+  `).join('');
+}
+function addSkill(){
+  const name=document.getElementById('sName').value.trim();
+  let icon=document.getElementById('sIcon').value.trim();
+  if(!name) return alert('Nama skill wajib');
+  if(!icon) icon='https://cdn.simpleicons.org/'+encodeURIComponent(name.toLowerCase())+'/ffffff';
+  const arr=getSkills(); arr.push({name, icon});
+  saveSkills(arr); document.getElementById('sName').value=''; document.getElementById('sIcon').value=''; renderSkillsAdmin();
+}
+function delSkill(i){ const arr=getSkills(); arr.splice(i,1); saveSkills(arr); renderSkillsAdmin(); }
+function resetSkills(){ localStorage.removeItem('ferdy_skills_v2'); renderSkillsAdmin(); alert('Skills reset ke default 9 ✓'); }
+
+function changePass(){
+  const a=document.getElementById('newPass').value;
+  const b=document.getElementById('newPass2').value;
+  const msg=document.getElementById('passMsg');
+  if(!a || a!==b){ msg.textContent='Sandi tidak cocok / kosong.'; msg.className='text-xs mt-2 text-red-400'; msg.classList.remove('hidden'); return; }
+  localStorage.setItem(PASS_KEY, a);
+  msg.textContent='Sandi berhasil diganti ✓'; msg.className='text-xs mt-2 text-green-400'; msg.classList.remove('hidden');
+}
+function wipeAll(){
+  if(!confirm('Hapus SEMUA data admin?')) return;
+  localStorage.removeItem('ferdy_projects_v2');
+  localStorage.removeItem('ferdy_journal_v2');
+  localStorage.removeItem('ferdy_skills_v2');
+  localStorage.removeItem('ferdy_daily_photos');
+  localStorage.removeItem('ferdy_profile_photo');
+  localStorage.removeItem('ferdy_about_photo');
+  localStorage.removeItem(PASS_KEY);
+  alert('Reset selesai'); location.reload();
+}
+checkAuth();
+document.getElementById('passInput')?.addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ferdy Fernando — 2411012007 | D4 Teknik Elektronika — Politeknik Negeri Padang</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{fontFamily:{kanit:['Kanit','sans-serif']}}}}</script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-[#0C0C0C] text-[#D7E2EA] font-kanit selection:bg-[#BBCCD7] selection:text-[#0C0C0C]">
+
+  <!-- LOADING PETIR JALAN (IMAGE 1) — bukan foto diam -->
+  <div id="loader-container">
+    <canvas id="lightningCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+    <div class="relative z-10 flex flex-col items-center justify-center text-center px-4">
+      <h1 class="text-3xl sm:text-5xl md:text-6xl font-black text-white uppercase tracking-wider lightning-glow mb-2">Welcome To My</h1>
+      <h2 class="text-4xl sm:text-6xl md:text-7xl font-black text-white uppercase tracking-wider lightning-glow mb-10">Portofolio Website</h2>
+      <div class="w-72 sm:w-96 flex justify-between items-center text-xs sm:text-sm font-mono tracking-widest text-white/60 mb-2"><span id="loaderStep">Preparing</span><span id="loaderPercent">0%</span></div>
+      <div class="w-72 sm:w-96 h-[3px] bg-white/10 rounded-full overflow-hidden border border-white/15"><div id="loaderBar" class="h-full bg-white w-0"></div></div>
+    </div>
+  </div>
+
+  <!-- HERO — FOTO BULAT DI KIRI & TEKS KIRI + EFEK PUTIH-PUTIH (kayak loader) -->
+  <section class="h-screen flex flex-col justify-between overflow-x-clip relative bg-[#0C0C0C]">
+    <canvas id="heroCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+    <nav class="w-full flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8 text-[#D7E2EA] font-medium uppercase tracking-wider text-sm md:text-lg lg:text-[1.4rem] z-20">
+      <a href="#about" class="hover:opacity-70 transition-opacity duration-200">About</a>
+      <a href="jurnal.html" class="hover:opacity-70 transition-opacity duration-200">Jurnal</a>
+      <a href="proyek.html" class="hover:opacity-70 transition-opacity duration-200">Proyek</a>
+      <a href="#contact" class="hover:opacity-70 transition-opacity duration-200">Contact</a>
+    </nav>
+
+    <!-- CENTER TITLE -->
+    <div class="w-full overflow-hidden text-center px-4 z-0 mt-8">
+      <h1 class="hero-heading font-black uppercase tracking-tight leading-none whitespace-nowrap block text-[10vw] sm:text-[11vw] md:text-[12vw] lg:text-[13vw]">Ferdy Fernando</h1>
+      <p class="text-[#D7E2EA] font-light uppercase tracking-[0.18em] text-[clamp(0.6rem,1.05vw,0.85rem)] mt-2 opacity-60">2411012007 — D4 Teknik Elektronika — Politeknik Negeri Padang</p>
+    </div>
+
+    <!-- FOTO BULAT DI KIRI -->
+    <!-- <div class="absolute left-6 md:left-12 top-1/2 -translate-y-1/2 z-15 hidden sm:block">
+      <div class="w-36 h-36 md:w-48 md:h-48 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl bg-black">
+        <img id="portraitImg" src="assets/profile.jpg" alt="Ferdy Fernando" class="w-full h-full object-cover hidden">
+        <img id="fallbackPortrait" src="https://shrug-person-78902957.figma.site/_components/v2/d24c01ad3a56fc65e942a1f501eb73db42d7cf9a/Rectangle_40443.81459862.png" alt="Ferdy Fernando" class="w-full h-full object-cover">
+      </div>
+    </div> -->
+    <!-- TEKS MAHASISWA TEKNIK ELEKTRONIKA DI KIRI (BAWAH) -->
+    <div class="w-full flex flex-col sm:flex-row justify-between items-start sm:items-end px-6 md:px-10 pb-7 sm:pb-8 md:pb-10 z-20 gap-4">
+      <p class="text-[#D7E2EA] font-light uppercase tracking-wide leading-snug text-[clamp(0.7rem,1.3vw,1.1rem)] max-w-[280px] sm:max-w-[340px]">Mahasiswa Teknik Elektronika — Robotika · Embedded System · Otomasi · Kontrol · Elektronika</p>
+      <div class="flex gap-2 sm:gap-3 shrink-0">
+        <a href="jurnal.html" class="rounded-full border-2 border-[#D7E2EA] px-5 py-2 sm:px-6 sm:py-3 text-[10px] sm:text-xs font-medium text-[#D7E2EA] uppercase tracking-widest hover:bg-[#D7E2EA]/10 transition-colors">Jurnal Belajar</a>
+        <a href="proyek.html" class="rounded-full px-5 py-2 sm:px-6 sm:py-3 text-[10px] sm:text-xs font-black uppercase tracking-widest inline-block text-center bg-white text-black border-2 border-white hover:bg-black hover:text-white transition-colors">Etalase Proyek</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <section id="marquee" class="bg-[#0C0C0C] pt-24 sm:pt-32 md:pt-40 pb-10 overflow-hidden relative">
+    <canvas id="marqueeCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-25"></canvas>
+    <div class="flex flex-col gap-3 relative z-10">
+      <div class="flex gap-3 overflow-hidden whitespace-nowrap py-2" style="will-change:transform"><div id="marqueeRow1" class="flex gap-3 shrink-0"></div></div>
+      <div class="flex gap-3 overflow-hidden whitespace-nowrap py-2" style="will-change:transform"><div id="marqueeRow2" class="flex gap-3 shrink-0"></div></div>
+    </div>
+  </section>
+
+
+
+  <!-- ABOUT ME — REDESIGN (ref ekawahyu style) + constellation -->
+  <section id="about" class="bg-[#0C0C0C] px-5 sm:px-8 md:px-10 py-20 sm:py-28 relative overflow-hidden">
+    <canvas id="aboutCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-15"></canvas>
+    <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      <div class="lg:col-span-5 relative">
+        <div class="rounded-[32px] overflow-hidden border border-white/10 bg-[#121622] p-3">
+          <img id="aboutPhoto" src="assets/profile.jpg" onerror="this.src='https://shrug-person-78902957.figma.site/_components/v2/d24c01ad3a56fc65e942a1f501eb73db42d7cf9a/Rectangle_40443.81459862.png'" alt="Ferdy Fernando — klik untuk ganti foto" class="w-full h-[380px] sm:h-[460px] object-cover rounded-[24px]">
+        </div>
+      </div>
+      <div class="lg:col-span-7 flex flex-col gap-5">
+        <span class="text-[11px] tracking-[0.2em] uppercase font-mono text-white/40 border border-white/10 rounded-full px-4 py-1.5 self-start">About Me — Ferdy Fernando</span>
+        <h2 class="hero-heading font-black uppercase leading-none tracking-tight text-[clamp(2.8rem,6vw,64px)]">Mahasiswa D4<br>Teknik Elektronika</h2>
+        <p class="text-[#D7E2EA] font-medium leading-relaxed text-[15px] sm:text-[16px]">Politeknik Negeri Padang — Fokus pada Robotika, Embedded System, Otomasi, Kontrol, dan Elektronika. Aku berfokus pada pengembangan teknologi yang tidak hanya fungsional, tetapi juga menghadirkan pengalaman digital yang menarik & berdampak.</p>
+        <p class="text-[#D7E2EA]/60 font-light leading-relaxed text-sm">Membangun project nyata dari skematik & PCB hingga firmware mikrokontroler (ESP32 / STM32 / Arduino) dan sistem kendali PID / ROS 2.</p>
+        <div class="grid grid-cols-3 gap-3 mt-2">
+          <div class="rounded-2xl bg-white text-black  p-4 text-center transition-all duration-300 hover:-translate-y-1.5 hover:bg-black hover:text-white hover:border-white hover:border cursor-pointer shadow-lg">
+            <p id="countProyek" class="text-2xl font-black">—</p><p class="text-[10px] uppercase tracking-widest opacity-60">Proyek</p>
+          </div>
+          <div class="rounded-2xl bg-white/10 border border-white/10 p-4 text-center transition-all duration-300 hover:-translate-y-1.5 hover:bg-white hover:text-black cursor-pointer shadow-lg">
+            <p id="countJurnal" class="text-2xl font-black">—</p><p class="text-[10px] uppercase tracking-widest opacity-60">Jurnal</p>
+          </div>
+          <div class="rounded-2xl bg-white/10 border border-white/10 p-4 text-center transition-all duration-300 hover:-translate-y-1.5 hover:bg-white hover:text-black cursor-pointer shadow-lg">
+            <p id="countSkills" class="text-2xl font-black">—</p><p class="text-[10px] uppercase tracking-widest opacity-60">Skills</p>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-3 mt-2">
+          <a href="jurnal.html" class="rounded-full border-2 border-[#D7E2EA] px-6 py-3 text-xs font-medium uppercase tracking-widest hover:bg-white hover:text-black transition-colors">Jurnal Belajar →</a>
+          <a href="proyek.html" class="rounded-full px-6 py-3 text-xs font-medium text-white uppercase tracking-widest bg-white text-black hover:bg-white/90" style="background:#fff;color:#000">Etalase Proyek →</a>
+          <a href="assets/CV-Ferdy-Fernando.pdf" target="_blank" class="rounded-full border border-white/20 px-6 py-3 text-xs font-mono uppercase tracking-widest">CV ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SKILLS — GRID CARDS GAYA REFERENSI (IMAGE 1) -->
+  <section id="skills" class="bg-[#0C0C0C] px-5 sm:px-8 md:px-10 py-20 sm:py-28 text-white relative overflow-hidden">
+    <canvas id="skillsCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-20"></canvas>
+    <div class="max-w-6xl mx-auto relative z-10">
+      <div class="text-center mb-14">
+        <span class="text-[11px] tracking-[0.2em] uppercase font-mono text-white/40 border border-white/10 rounded-full px-4 py-1.5 inline-block mb-3">Tech Stack & Tools</span>
+        <h2 class="hero-heading font-black uppercase tracking-tight text-[clamp(2.5rem,6vw,60px)] leading-none">Skills</h2>
+      </div>
+      <div id="skillsList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5"></div>
+    </div>
+  </section>
+
+  <!-- JURNAL PREVIEW -->
+  <section id="jurnal" class="bg-[#FFFFFF] px-5 sm:px-8 md:px-10 py-20 sm:py-24 text-[#0C0C0C] relative overflow-hidden">
+    <canvas id="jurnalCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-15"></canvas>
+    <div class="max-w-5xl mx-auto">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+        <h2 class="font-black uppercase tracking-tight text-[clamp(2.4rem,7vw,72px)] leading-none text-[#0C0C0C]">Jurnal Belajar</h2>
+        <a href="jurnal.html" class="rounded-full border-2 border-[#0C0C0C] px-6 py-3 text-xs sm:text-sm font-medium text-[#0C0C0C] uppercase tracking-widest hover:bg-[#0C0C0C]/10 transition-colors shrink-0">Lihat Semua →</a>
+      </div>
+      <p class="font-light text-[clamp(0.9rem,1.5vw,1.05rem)] opacity-60 max-w-2xl mb-10">Perjalanan belajar mingguan: ringkasan, progres, tantangan, hasil, dan pembelajaran. Klik untuk detail + foto & Google Drive. Kelola via HP: admin.html (sandi).</p>
+      <div id="journalPreview" class="flex flex-col"></div>
+    </div>
+  </section>
+
+  <!-- ETALASE PREVIEW — EFEK PUTIH SEPERTI JURNAL BELAJAR -->
+  <section id="projects" class="bg-[#FFFFFF] px-5 sm:px-8 md:px-10 py-20 text-[#0C0C0C] relative overflow-hidden">
+    <canvas id="projectsCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-15"></canvas>
+    <div class="max-w-7xl mx-auto">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+        <h2 class="font-black uppercase tracking-tight text-[clamp(3rem,12vw,160px)] leading-none text-[#0C0C0C]">Etalase</h2>
+        <div class="flex gap-2 shrink-0">
+          <a href="admin.html" class="rounded-full border border-black/20 px-4 py-2 text-[10px] font-mono uppercase tracking-widest text-[#0C0C0C]">🔒 Kelola via HP</a>
+          <a href="proyek.html" class="rounded-full border-2 border-[#0C0C0C] px-6 py-3 text-xs sm:text-sm font-medium text-[#0C0C0C] uppercase tracking-widest hover:bg-[#0C0C0C]/10 transition-colors">Lihat Semua →</a>
+        </div>
+      </div>
+      <div id="projectsPreview" class="flex flex-col gap-10"></div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <footer id="contact" class="bg-[#0C0C0C] text-[#D7E2EA] px-6 md:px-10 py-24 border-t border-[#D7E2EA]/10 relative overflow-hidden">
+    <canvas id="contactCanvas" class="absolute inset-0 w-full h-full pointer-events-none opacity-20"></canvas>
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-12 relative z-10">
+      <div>
+        <h3 class="hero-heading font-black uppercase text-[clamp(2.5rem,7vw,72px)] leading-none">Let&apos;s Talk</h3>
+        <p class="mt-3 text-white/80 text-sm max-w-md leading-relaxed">Ada yang mau didiskusikan? Langsung kirim pesan aja ya..!</p>
+        <div class="mt-8 grid grid-cols-2 sm:flex sm:flex-wrap gap-3">
+          <a href="mailto:akuferdy124@gmail.com" class="group px-4 py-3 rounded-2xl bg-[#181818] border border-white/10 flex items-center gap-2.5 hover:bg-white hover:text-black transition-all duration-300 hover:-translate-y-1">
+            <img src="https://cdn.simpleicons.org/gmail/EA4335" alt="Gmail" class="w-5 h-5 group-hover:brightness-0 transition-all">
+            <span class="text-[11px] font-bold uppercase tracking-widest">Gmail</span>
+          </a>
+          <a href="https://wa.me/6283874535719" target="_blank" class="group px-4 py-3 rounded-2xl bg-[#181818] border border-white/10 flex items-center gap-2.5 hover:bg-white hover:text-black transition-all duration-300 hover:-translate-y-1">
+            <img src="https://cdn.simpleicons.org/whatsapp/25D366" alt="WA" class="w-5 h-5 group-hover:brightness-0 transition-all">
+            <span class="text-[11px] font-bold uppercase tracking-widest">WhatsApp</span>
+          </a>
+          <a href="https://www.instagram.com/feerddyy__/?hl=en" target="_blank" class="group px-4 py-3 rounded-2xl bg-[#181818] border border-white/10 flex items-center gap-2.5 hover:bg-white hover:text-black transition-all duration-300 hover:-translate-y-1">
+            <img src="https://cdn.simpleicons.org/instagram/E4405F" alt="IG" class="w-5 h-5 group-hover:brightness-0 transition-all">
+            <span class="text-[11px] font-bold uppercase tracking-widest">Instagram</span>
+          </a>
+          <a href="https://github.com/akuferdy124-code" target="_blank" class="group px-4 py-3 rounded-2xl bg-[#181818] border border-white/10 flex items-center gap-2.5 hover:bg-white hover:text-black transition-all duration-300 hover:-translate-y-1">
+            <img src="https://cdn.simpleicons.org/github/ffffff" alt="GitHub" class="w-5 h-5 group-hover:brightness-0 transition-all">
+            <span class="text-[11px] font-bold uppercase tracking-widest">GitHub</span>
+          </a>
+        </div>
+
+      </div>
+      <a href="https://wa.me/6283874535719" target="_blank" class="rounded-full px-8 py-3 sm:px-10 sm:py-3.5 text-xs sm:text-sm font-black text-black bg-white uppercase tracking-widest inline-block text-center hover:scale-105 transition-transform duration-200 shrink-0">Contact Me</a>
+    </div>
+  </footer>
+
+  <div id="detailModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden items-center justify-center p-4 sm:p-6">
+    <div class="bg-[#0C0C0C] border-2 border-[#D7E2EA] rounded-[32px] sm:rounded-[40px] max-w-4xl w-full max-h-[90vh] overflow-y-auto relative">
+      <button onclick="closeModal()" class="absolute top-4 right-4 w-10 h-10 rounded-full border-2 border-[#D7E2EA] text-[#D7E2EA] grid place-items-center hover:bg-[#D7E2EA]/10 text-xl leading-none">×</button>
+      <div id="modalContent" class="p-6 sm:p-8 md:p-10"></div>
+    </div>
+  </div>
+
+  <script src="data/projects.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
