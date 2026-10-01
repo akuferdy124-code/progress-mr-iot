@@ -173,7 +173,7 @@ function initMarquee(){
   const row1Items = [...engineeringTags, ...engineeringTags];
   const row2Items = [...dynamicTechVisuals, ...dynamicTechVisuals];
   r1.innerHTML = row1Items.map(t => '<div class="group px-8 py-4 rounded-2xl bg-[#121614] border border-[#D7E2EA]/20 font-mono text-sm tracking-widest text-[#D7E2EA] shrink-0 flex items-center gap-3 cursor-pointer hover:text-black hover:bg-white hover:border-white transition-all duration-200"><span class="w-2 h-2 rounded-full bg-[#D7E2EA] opacity-80 group-hover:bg-black transition-colors"></span><span>' + t + '</span></div>').join('');
-  r2.innerHTML = row2Items.map(u => '<img src="' + u + '" loading="lazy" class="w-[360px] h-[220px] rounded-2xl object-cover shrink-0 filter grayscale hover:grayscale-0 hover:border-[#D7E2EA] transition-all duration-300 border border-[#D7E2EA]/20 cursor-pointer" alt="Engineering Hardware">').join('');
+  r2.innerHTML = row2Items.map(u => '<img src="' + u + '" loading="lazy" class="w-[360px] h-[220px] rounded-2xl object-cover shrink-0 hover:border-[#D7E2EA] transition-all duration-300 border border-[#D7E2EA]/20 cursor-pointer" alt="Engineering Hardware">').join('');
   window.addEventListener('scroll', ()=>{
     const offset = (window.scrollY - sec.offsetTop + window.innerHeight) * 0.25;
     r1.style.transform = 'translateX(' + (offset - 150) + 'px)';

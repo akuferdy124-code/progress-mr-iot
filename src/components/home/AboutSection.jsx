@@ -18,7 +18,7 @@ export const AboutSection = () => {
             <img
               src={aboutPhoto}
               alt="Ferdy Fernando"
-              className="w-full h-[380px] sm:h-[480px] object-cover rounded-[24px] filter brightness-95 contrast-105 group-hover:scale-[1.02] transition-transform duration-500"
+              className="w-full h-[380px] sm:h-[480px] object-cover rounded-[24px] group-hover:scale-[1.02] transition-transform duration-500"
               onError={(e) => {
                 e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=800&q=80';
               }}

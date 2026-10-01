@@ -39,7 +39,7 @@ export const MarqueeSection = () => {
                 <img
                   src={imgUrl}
                   alt="Engineering Hardware"
-                  className="w-full h-full object-cover filter grayscale contrast-125 group-hover/img:grayscale-0 group-hover/img:scale-105 transition-all duration-500"
+                  className="w-full h-full object-cover group-hover/img:scale-105 transition-all duration-500"
                   loading="lazy"
                 />
               </div>
