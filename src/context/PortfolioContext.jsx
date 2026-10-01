@@ -1,5 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { initialProjectsData, initialJournalData, initialSkillsList } from '../data/portfolioData';
+import { initialProjectsData, initialJournalData, initialSkillsList, dynamicTechVisuals } from '../data/portfolioData';
+
+const DEFAULT_BIO1 = 'Politeknik Negeri Padang — Berfokus pada Robotika, Embedded System, Otomasi Industri, Kontrol PID, dan Elektronika Terapan. Berkomitmen mengembangkan perangkat keras dan firmware mikrokontroler yang tidak hanya fungsional secara teknis, tetapi juga efisien dan presisi.';
+const DEFAULT_BIO2 = 'Terbiasa merancang solusi dari level skematik & layout PCB di KiCad, firmware mikrokontroler (ESP32-S3 / STM32 / Arduino C++), hingga integrasi sistem tingkat lanjut seperti micro-ROS 2 Jazzy dan PLC Ladder Diagram.';
 
 const PortfolioContext = createContext();
 
@@ -64,6 +67,25 @@ export const PortfolioProvider = ({ children }) => {
     ];
   });
 
+  const [profileBio, setProfileBio] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ferdy_profile_bio');
+      if (saved) return JSON.parse(saved);
+    } catch (e) {}
+    return { bio1: DEFAULT_BIO1, bio2: DEFAULT_BIO2 };
+  });
+
+  const [galleryPhotos, setGalleryPhotos] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ferdy_gallery_photos');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return [];
+  });
+
   const [modalState, setModalState] = useState({
     isOpen: false,
     type: null,
@@ -103,6 +125,25 @@ export const PortfolioProvider = ({ children }) => {
         if (Array.isArray(dataS) && dataS.length > 0) {
           setSkills(dataS);
           localStorage.setItem('ferdy_skills_v2', JSON.stringify(dataS));
+        }
+      }
+
+      // 4. Profile (photo, bio, gallery)
+      const resProf = await fetch('/api/profile');
+      if (resProf.ok) {
+        const prof = await resProf.json();
+        if (prof.photo) {
+          setAboutPhoto(prof.photo);
+          localStorage.setItem('ferdy_about_photo', prof.photo);
+        }
+        if (prof.bio1 || prof.bio2) {
+          const bio = { bio1: prof.bio1 || DEFAULT_BIO1, bio2: prof.bio2 || DEFAULT_BIO2 };
+          setProfileBio(bio);
+          localStorage.setItem('ferdy_profile_bio', JSON.stringify(bio));
+        }
+        if (Array.isArray(prof.galleryPhotos) && prof.galleryPhotos.length > 0) {
+          setGalleryPhotos(prof.galleryPhotos);
+          localStorage.setItem('ferdy_gallery_photos', JSON.stringify(prof.galleryPhotos));
         }
       }
     } catch (err) {
@@ -269,13 +310,46 @@ export const PortfolioProvider = ({ children }) => {
     }
   };
 
-  // Profile photo update
-  const updateAboutPhoto = (photoUrl) => {
+  // Profile photo update (saved to MongoDB)
+  const updateAboutPhoto = async (photoUrl) => {
     setAboutPhoto(photoUrl);
     try {
       localStorage.setItem('ferdy_about_photo', photoUrl);
       localStorage.setItem('ferdy_profile_photo', photoUrl);
     } catch (e) {}
+    try {
+      await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field: 'profile_photo', value: photoUrl }),
+      });
+    } catch (e) { console.error('Error saving profile photo:', e); }
+  };
+
+  // Bio update
+  const updateBio = async (bio1, bio2) => {
+    const newBio = { bio1, bio2 };
+    setProfileBio(newBio);
+    localStorage.setItem('ferdy_profile_bio', JSON.stringify(newBio));
+    try {
+      await Promise.all([
+        fetch('/api/profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ field: 'bio1', value: bio1 }) }),
+        fetch('/api/profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ field: 'bio2', value: bio2 }) }),
+      ]);
+    } catch (e) { console.error('Error saving bio:', e); }
+  };
+
+  // Gallery photos update
+  const saveGalleryPhotos = async (photos) => {
+    setGalleryPhotos(photos);
+    localStorage.setItem('ferdy_gallery_photos', JSON.stringify(photos));
+    try {
+      await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ field: 'gallery_photos', value: photos }),
+      });
+    } catch (e) { console.error('Error saving gallery:', e); }
   };
 
   // Auth (MongoDB + LocalStorage fallback)
@@ -325,6 +399,8 @@ export const PortfolioProvider = ({ children }) => {
         skills,
         aboutPhoto,
         dailyPhotos,
+        profileBio,
+        galleryPhotos,
         modalState,
         isDbConnected,
         refreshFromDb,
@@ -338,6 +414,8 @@ export const PortfolioProvider = ({ children }) => {
         saveSkill,
         deleteSkill,
         updateAboutPhoto,
+        updateBio,
+        saveGalleryPhotos,
         verifyPassword,
         changePassword,
       }}

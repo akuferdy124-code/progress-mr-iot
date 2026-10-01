@@ -5,7 +5,7 @@ import { ParticleCanvas } from '../common/ParticleCanvas';
 import { ArrowRight, FileText } from 'lucide-react';
 
 export const AboutSection = () => {
-  const { projects, journals, skills, aboutPhoto } = usePortfolio();
+  const { projects, journals, skills, aboutPhoto, profileBio } = usePortfolio();
 
   return (
     <section id="about" className="bg-[#0C0C0C] px-5 sm:px-8 md:px-10 py-24 sm:py-32 relative overflow-hidden">
@@ -45,11 +45,11 @@ export const AboutSection = () => {
           </h2>
 
           <p className="text-[#D7E2EA] font-normal leading-relaxed text-[15px] sm:text-[16px]">
-            Politeknik Negeri Padang — Berfokus pada <strong className="text-white">Robotika, Embedded System, Otomasi Industri, Kontrol PID, dan Elektronika Terapan</strong>. Berkomitmen mengembangkan perangkat keras dan firmware mikrokontroler yang tidak hanya fungsional secara teknis, tetapi juga efisien dan presisi.
+            {profileBio?.bio1 || 'Politeknik Negeri Padang — Berfokus pada Robotika, Embedded System, Otomasi Industri, Kontrol PID, dan Elektronika Terapan.'}
           </p>
 
           <p className="text-[#D7E2EA]/60 font-light leading-relaxed text-sm">
-            Terbiasa merancang solusi dari level skematik & layout PCB di KiCad, firmware mikrokontroler (ESP32-S3 / STM32 / Arduino C++), hingga integrasi sistem tingkat lanjut seperti micro-ROS 2 Jazzy dan PLC Ladder Diagram.
+            {profileBio?.bio2 || 'Terbiasa merancang solusi dari level skematik & layout PCB di KiCad, firmware mikrokontroler (ESP32-S3 / STM32 / Arduino C++), hingga integrasi sistem tingkat lanjut seperti micro-ROS 2 Jazzy dan PLC Ladder Diagram.'}
           </p>
 
           {/* Interactive Stat Counters */}

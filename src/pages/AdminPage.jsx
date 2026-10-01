@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Shield, Plus, Edit2, Trash2, Key, FolderKanban, BookOpen, Wrench, ArrowLeft, Check, AlertCircle } from 'lucide-react';
+import { Shield, Plus, Edit2, Trash2, Key, FolderKanban, BookOpen, Wrench, ArrowLeft, Check, AlertCircle, User, Image, FileText } from 'lucide-react';
 
 export const AdminPage = () => {
   const {
@@ -14,6 +14,12 @@ export const AdminPage = () => {
     skills,
     saveSkill,
     deleteSkill,
+    aboutPhoto,
+    updateAboutPhoto,
+    profileBio,
+    updateBio,
+    galleryPhotos,
+    saveGalleryPhotos,
     verifyPassword,
     changePassword,
   } = usePortfolio();
@@ -21,8 +27,13 @@ export const AdminPage = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [passwordInput, setPasswordInput] = useState('');
   const [loginError, setLoginError] = useState(false);
-  const [activeTab, setActiveTab] = useState('projek'); // 'projek' | 'jurnal' | 'skills' | 'sandi'
+  const [activeTab, setActiveTab] = useState('projek'); // 'projek' | 'jurnal' | 'skills' | 'sandi' | 'profil'
   const [statusMsg, setStatusMsg] = useState(null);
+
+  // PROFIL FORM STATE
+  const [bioForm, setBioForm] = useState({ bio1: '', bio2: '' });
+  const [bioEditMode, setBioEditMode] = useState(false);
+  const [newGalleryUrl, setNewGalleryUrl] = useState('');
 
   // PROJECT FORM STATE
   const [pEditId, setPEditId] = useState(null);
@@ -362,6 +373,14 @@ export const AdminPage = () => {
             }`}
           >
             <Key className="w-3.5 h-3.5" /> Sandi
+          </button>
+          <button
+            onClick={() => { setActiveTab('profil'); setBioForm({ bio1: profileBio?.bio1 || '', bio2: profileBio?.bio2 || '' }); }}
+            className={`flex items-center gap-1.5 px-5 py-2.5 rounded-full text-xs font-bold uppercase whitespace-nowrap transition-all ${
+              activeTab === 'profil' ? 'bg-white text-black shadow-lg scale-105' : 'bg-white/10 text-white/70 hover:bg-white/20'
+            }`}
+          >
+            <User className="w-3.5 h-3.5" /> Profil & Foto
           </button>
         </div>
 
@@ -956,6 +975,220 @@ export const AdminPage = () => {
                 Simpan Sandi Baru
               </button>
             </form>
+          </div>
+        )}
+        {/* ================= TAB 5: PROFIL & FOTO ================= */}
+        {activeTab === 'profil' && (
+          <div className="space-y-8">
+
+            {/* --- FOTO PROFIL --- */}
+            <div className="bg-[#121622] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
+              <h2 className="font-black uppercase text-base sm:text-lg text-white mb-4 flex items-center gap-2">
+                <User className="w-4 h-4 text-sky-400" /> Foto Profil (About)
+              </h2>
+              <div className="flex flex-col sm:flex-row gap-6 items-start">
+                <img
+                  src={aboutPhoto}
+                  alt="Foto Profil"
+                  className="w-28 h-28 rounded-2xl object-cover border border-white/20 shrink-0"
+                />
+                <div className="flex-1 space-y-3">
+                  <div>
+                    <label className="text-xs text-white/50 block mb-1">Upload Foto dari HP / Galeri</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const reader = new FileReader();
+                        reader.onload = async (ev) => {
+                          await updateAboutPhoto(ev.target.result);
+                          flashMessage('Foto profil berhasil diperbarui!');
+                        };
+                        reader.readAsDataURL(file);
+                      }}
+                      className="w-full text-xs text-white/60 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-white/50 block mb-1">Atau masukkan URL foto</label>
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        placeholder="https://drive.google.com/... atau link foto"
+                        id="photoUrlInput"
+                        className="flex-1 rounded-xl bg-black/50 border border-white/10 px-3.5 py-2.5 text-sm text-white outline-none focus:border-white"
+                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          const url = document.getElementById('photoUrlInput').value.trim();
+                          if (!url) return;
+                          await updateAboutPhoto(url);
+                          document.getElementById('photoUrlInput').value = '';
+                          flashMessage('Foto profil diperbarui!');
+                        }}
+                        className="px-4 py-2.5 rounded-xl bg-white text-black text-xs font-black uppercase hover:bg-white/90 transition-all"
+                      >
+                        Simpan
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* --- BIO / DESKRIPSI --- */}
+            <div className="bg-[#121622] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
+              <h2 className="font-black uppercase text-base sm:text-lg text-white mb-4 flex items-center gap-2">
+                <FileText className="w-4 h-4 text-violet-400" /> Bio & Deskripsi
+              </h2>
+              {!bioEditMode ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-white/80 leading-relaxed bg-white/5 rounded-xl p-4">{profileBio?.bio1}</p>
+                  <p className="text-sm text-white/50 leading-relaxed bg-white/5 rounded-xl p-4">{profileBio?.bio2}</p>
+                  <button
+                    onClick={() => { setBioForm({ bio1: profileBio?.bio1 || '', bio2: profileBio?.bio2 || '' }); setBioEditMode(true); }}
+                    className="flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-white/10 text-sm font-semibold hover:bg-white/20 transition-all"
+                  >
+                    <Edit2 className="w-4 h-4" /> Edit Bio
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs text-white/50 block mb-1">Paragraf 1 (Utama)</label>
+                    <textarea
+                      rows={4}
+                      value={bioForm.bio1}
+                      onChange={(e) => setBioForm({ ...bioForm, bio1: e.target.value })}
+                      className="w-full rounded-xl bg-black/50 border border-white/10 px-3.5 py-2.5 text-sm text-white outline-none focus:border-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-white/50 block mb-1">Paragraf 2 (Detail Teknis)</label>
+                    <textarea
+                      rows={3}
+                      value={bioForm.bio2}
+                      onChange={(e) => setBioForm({ ...bioForm, bio2: e.target.value })}
+                      className="w-full rounded-xl bg-black/50 border border-white/10 px-3.5 py-2.5 text-sm text-white outline-none focus:border-white"
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        await updateBio(bioForm.bio1, bioForm.bio2);
+                        setBioEditMode(false);
+                        flashMessage('Bio berhasil diperbarui!');
+                      }}
+                      className="px-6 py-2.5 rounded-xl bg-white text-black text-sm font-black uppercase hover:bg-white/90 transition-all"
+                    >
+                      Simpan Bio
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBioEditMode(false)}
+                      className="px-4 py-2.5 rounded-xl bg-white/10 text-xs font-semibold hover:bg-white/20"
+                    >
+                      Batal
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* --- FOTO GALERI (Marquee) --- */}
+            <div className="bg-[#121622] border border-white/10 rounded-3xl p-6 sm:p-8 shadow-xl">
+              <h2 className="font-black uppercase text-base sm:text-lg text-white mb-1 flex items-center gap-2">
+                <Image className="w-4 h-4 text-emerald-400" /> Foto Galeri Homepage
+              </h2>
+              <p className="text-xs text-white/40 mb-4">Foto-foto ini tampil di slideshow/marquee bawah homepage. Upload dari HP atau masukkan URL.</p>
+
+              {/* Add new photo */}
+              <div className="space-y-3 mb-6">
+                <div>
+                  <label className="text-xs text-white/50 block mb-1">Upload Foto Baru dari HP</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => {
+                      const files = e.target.files;
+                      if (!files || !files.length) return;
+                      const readers = Array.from(files).map(
+                        (file) => new Promise((resolve) => {
+                          const r = new FileReader();
+                          r.onload = (ev) => resolve(ev.target.result);
+                          r.readAsDataURL(file);
+                        })
+                      );
+                      Promise.all(readers).then(async (newPhotos) => {
+                        const updated = [...galleryPhotos, ...newPhotos];
+                        await saveGalleryPhotos(updated);
+                        flashMessage(`${newPhotos.length} foto galeri ditambahkan!`);
+                      });
+                    }}
+                    className="w-full text-xs text-white/60 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-white/50 block mb-1">Atau tambah via URL</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="url"
+                      placeholder="https://... link foto proyek kamu"
+                      value={newGalleryUrl}
+                      onChange={(e) => setNewGalleryUrl(e.target.value)}
+                      className="flex-1 rounded-xl bg-black/50 border border-white/10 px-3.5 py-2.5 text-sm text-white outline-none focus:border-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (!newGalleryUrl.trim()) return;
+                        const updated = [...galleryPhotos, newGalleryUrl.trim()];
+                        await saveGalleryPhotos(updated);
+                        setNewGalleryUrl('');
+                        flashMessage('Foto galeri ditambahkan!');
+                      }}
+                      className="px-4 py-2.5 rounded-xl bg-white text-black text-xs font-black uppercase hover:bg-white/90 transition-all"
+                    >
+                      Tambah
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Gallery Grid */}
+              <h3 className="font-bold text-xs uppercase tracking-wider text-white/50 mb-3">
+                Foto Saat Ini ({galleryPhotos.length})
+                {galleryPhotos.length === 0 && <span className="ml-2 text-white/30 normal-case font-normal">— kosong, menampilkan foto bawaan</span>}
+              </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {galleryPhotos.map((photo, idx) => (
+                  <div key={idx} className="relative rounded-xl overflow-hidden border border-white/10 group aspect-video">
+                    <img src={photo} alt={`Galeri ${idx + 1}`} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button
+                        onClick={async () => {
+                          if (window.confirm(`Hapus foto galeri #${idx + 1}?`)) {
+                            const updated = galleryPhotos.filter((_, i) => i !== idx);
+                            await saveGalleryPhotos(updated);
+                            flashMessage('Foto dihapus dari galeri.');
+                          }
+                        }}
+                        className="p-2 rounded-xl bg-red-600 text-white"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <span className="absolute bottom-1 left-1 text-[10px] bg-black/70 text-white px-2 py-0.5 rounded-lg">#{idx + 1}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </div>
         )}
       </div>
