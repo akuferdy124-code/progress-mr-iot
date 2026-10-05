@@ -35,13 +35,13 @@ export const HeroSection = () => {
         <div className="flex flex-wrap gap-3 shrink-0">
           <Link
             to="/jurnal"
-            className="rounded-full border-2 border-[#D7E2EA] px-6 py-3 text-xs font-semibold text-[#D7E2EA] uppercase tracking-widest hover:bg-white hover:text-black hover:border-white transition-all duration-200"
+            className="rounded-full border-2 border-[#D7E2EA]/50 px-6 py-3 text-xs font-bold text-[#D7E2EA] uppercase tracking-widest hover:bg-white hover:text-black hover:border-white transition-all duration-300 hover:-translate-y-1 hover:scale-105 hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] active:scale-95"
           >
             Jurnal Belajar
           </Link>
           <Link
             to="/proyek"
-            className="rounded-full px-6 py-3 text-xs font-black uppercase tracking-widest inline-flex items-center gap-1.5 text-center bg-white text-black border-2 border-white hover:bg-black hover:text-white transition-all duration-200 shadow-[0_0_20px_rgba(255,255,255,0.2)]"
+            className="rounded-full px-6 py-3 text-xs font-black uppercase tracking-widest inline-flex items-center gap-1.5 text-center bg-white text-black border-2 border-white hover:bg-black hover:text-white transition-all duration-300 hover:-translate-y-1 hover:scale-105 shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.6)] active:scale-95"
           >
             Etalase Proyek <ArrowUpRight className="w-4 h-4" />
           </Link>

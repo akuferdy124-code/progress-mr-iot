@@ -58,19 +58,25 @@ export const Navbar = () => {
         </Link>
 
         {/* Desktop Menu */}
-        <div className="hidden md:flex items-center gap-8 text-[#D7E2EA] font-medium uppercase tracking-wider text-sm md:text-base">
+        <div className="hidden md:flex items-center gap-1.5 bg-[#121614]/85 backdrop-blur-md p-1.5 rounded-full border border-white/15 shadow-2xl">
           {navLinks.map((link) => {
             const isActive =
               link.path === '/'
                 ? location.pathname === '/' && !location.hash
                 : location.pathname === link.path;
 
+            const baseClass = `px-5 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 cursor-pointer flex items-center gap-1.5 ${
+              isActive
+                ? 'bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.4)] scale-105'
+                : 'text-white/70 hover:text-black hover:bg-white hover:-translate-y-1 hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.45)]'
+            }`;
+
             return link.isAnchor && location.pathname === '/' ? (
               <a
                 key={link.label}
                 href={link.path.replace('/', '')}
                 onClick={(e) => handleAnchorClick(e, link.path)}
-                className="hover:text-white transition-colors py-1 relative hover:opacity-100 opacity-80"
+                className={baseClass}
               >
                 {link.label}
               </a>
@@ -78,11 +84,7 @@ export const Navbar = () => {
               <Link
                 key={link.label}
                 to={link.path}
-                className={`hover:text-white transition-colors py-1 relative ${
-                  isActive
-                    ? 'text-white font-bold after:content-[""] after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-white'
-                    : 'opacity-80 hover:opacity-100'
-                }`}
+                className={baseClass}
               >
                 {link.label}
               </Link>
@@ -91,7 +93,7 @@ export const Navbar = () => {
 
           <Link
             to="/admin"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white hover:text-black border border-white/20 text-xs font-mono transition-all duration-200"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-full border border-white/20 text-xs font-mono font-bold tracking-wider text-white/80 transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:text-black hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.45)] ml-1"
             title="Admin HP Dashboard"
           >
             <Shield className="w-3.5 h-3.5" />
@@ -103,7 +105,7 @@ export const Navbar = () => {
         <div className="flex md:hidden items-center gap-3">
           <Link
             to="/admin"
-            className="p-2 rounded-full bg-white/10 text-white"
+            className="p-2.5 rounded-full bg-white/10 text-white hover:bg-white hover:text-black transition-all duration-200"
             title="Admin HP"
           >
             <Shield className="w-4 h-4" />
@@ -111,7 +113,7 @@ export const Navbar = () => {
 
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-white hover:bg-white/10 transition-colors"
+            className="p-2.5 rounded-xl text-white hover:bg-white/10 transition-colors"
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -121,7 +123,7 @@ export const Navbar = () => {
 
       {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0C0C0C]/95 backdrop-blur-xl border-b border-white/10 px-6 py-6 flex flex-col gap-4 animate-fadeIn">
+        <div className="md:hidden bg-[#0C0C0C]/95 backdrop-blur-xl border-b border-white/10 px-6 py-6 flex flex-col gap-3 animate-fadeIn">
           {navLinks.map((link) => (
             <Link
               key={link.label}
@@ -132,14 +134,14 @@ export const Navbar = () => {
                   setMobileMenuOpen(false);
                 }
               }}
-              className="text-lg uppercase tracking-wider font-semibold text-[#D7E2EA] hover:text-white py-2 border-b border-white/5"
+              className="text-sm uppercase tracking-wider font-bold text-white/80 hover:text-black hover:bg-white px-4 py-3 rounded-2xl transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg border border-transparent hover:border-white"
             >
               {link.label}
             </Link>
           ))}
           <Link
             to="/admin"
-            className="flex items-center justify-center gap-2 py-3 rounded-xl bg-white text-black font-bold uppercase tracking-widest text-xs mt-2"
+            className="flex items-center justify-center gap-2 py-3 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-xs mt-2 hover:scale-[1.02] shadow-[0_0_20px_rgba(255,255,255,0.3)] transition-all"
           >
             <Shield className="w-4 h-4" />
             Admin Panel HP
