@@ -94,57 +94,82 @@ export const PortfolioProvider = ({ children }) => {
 
   const [isDbConnected, setIsDbConnected] = useState(false);
 
+  const safeSetItem = (key, value) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn(`LocalStorage quota exceeded for ${key}, skipping local cache:`, e);
+    }
+  };
+
   // Sync data from MongoDB Atlas API
   const refreshFromDb = useCallback(async () => {
     try {
       // 1. Projects
-      const resP = await fetch('/api/projects');
-      if (resP.ok) {
-        const dataP = await resP.json();
-        if (Array.isArray(dataP) && dataP.length > 0) {
-          setProjects(dataP);
-          localStorage.setItem('ferdy_projects_v2', JSON.stringify(dataP));
-          setIsDbConnected(true);
+      try {
+        const resP = await fetch('/api/projects');
+        if (resP.ok) {
+          const dataP = await resP.json();
+          if (Array.isArray(dataP) && dataP.length > 0) {
+            setProjects(dataP);
+            safeSetItem('ferdy_projects_v2', JSON.stringify(dataP));
+            setIsDbConnected(true);
+          }
         }
+      } catch (errP) {
+        console.warn('Projects sync error:', errP);
       }
 
       // 2. Journals
-      const resJ = await fetch('/api/journals');
-      if (resJ.ok) {
-        const dataJ = await resJ.json();
-        if (Array.isArray(dataJ) && dataJ.length > 0) {
-          setJournals(dataJ);
-          localStorage.setItem('ferdy_journal_v2', JSON.stringify(dataJ));
+      try {
+        const resJ = await fetch('/api/journals');
+        if (resJ.ok) {
+          const dataJ = await resJ.json();
+          if (Array.isArray(dataJ) && dataJ.length > 0) {
+            setJournals(dataJ);
+            safeSetItem('ferdy_journal_v2', JSON.stringify(dataJ));
+          }
         }
+      } catch (errJ) {
+        console.warn('Journals sync error:', errJ);
       }
 
       // 3. Skills
-      const resS = await fetch('/api/skills');
-      if (resS.ok) {
-        const dataS = await resS.json();
-        if (Array.isArray(dataS) && dataS.length > 0) {
-          setSkills(dataS);
-          localStorage.setItem('ferdy_skills_v2', JSON.stringify(dataS));
+      try {
+        const resS = await fetch('/api/skills');
+        if (resS.ok) {
+          const dataS = await resS.json();
+          if (Array.isArray(dataS) && dataS.length > 0) {
+            setSkills(dataS);
+            safeSetItem('ferdy_skills_v2', JSON.stringify(dataS));
+          }
         }
+      } catch (errS) {
+        console.warn('Skills sync error:', errS);
       }
 
       // 4. Profile (photo, bio, gallery)
-      const resProf = await fetch('/api/profile');
-      if (resProf.ok) {
-        const prof = await resProf.json();
-        if (prof.photo) {
-          setAboutPhoto(prof.photo);
-          localStorage.setItem('ferdy_about_photo', prof.photo);
+      try {
+        const resProf = await fetch('/api/profile');
+        if (resProf.ok) {
+          const prof = await resProf.json();
+          if (prof.photo) {
+            setAboutPhoto(prof.photo);
+            safeSetItem('ferdy_about_photo', prof.photo);
+            safeSetItem('ferdy_profile_photo', prof.photo);
+          }
+          if (prof.bio1 || prof.bio2) {
+            const bio = { bio1: prof.bio1 || DEFAULT_BIO1, bio2: prof.bio2 || DEFAULT_BIO2 };
+            setProfileBio(bio);
+            safeSetItem('ferdy_profile_bio', JSON.stringify(bio));
+          }
+          if (Array.isArray(prof.galleryPhotos) && prof.galleryPhotos.length > 0) {
+            setGalleryPhotos(prof.galleryPhotos);
+            safeSetItem('ferdy_gallery_photos', JSON.stringify(prof.galleryPhotos));
+          }
         }
-        if (prof.bio1 || prof.bio2) {
-          const bio = { bio1: prof.bio1 || DEFAULT_BIO1, bio2: prof.bio2 || DEFAULT_BIO2 };
-          setProfileBio(bio);
-          localStorage.setItem('ferdy_profile_bio', JSON.stringify(bio));
-        }
-        if (Array.isArray(prof.galleryPhotos) && prof.galleryPhotos.length > 0) {
-          setGalleryPhotos(prof.galleryPhotos);
-          localStorage.setItem('ferdy_gallery_photos', JSON.stringify(prof.galleryPhotos));
-        }
+      } catch (errProf) {
+        console.warn('Profile sync error:', errProf);
       }
     } catch (err) {
       console.warn('API sync warning (using cached data):', err);
@@ -313,43 +338,65 @@ export const PortfolioProvider = ({ children }) => {
   // Profile photo update (saved to MongoDB)
   const updateAboutPhoto = async (photoUrl) => {
     setAboutPhoto(photoUrl);
+    safeSetItem('ferdy_about_photo', photoUrl);
+    safeSetItem('ferdy_profile_photo', photoUrl);
+
     try {
-      localStorage.setItem('ferdy_about_photo', photoUrl);
-      localStorage.setItem('ferdy_profile_photo', photoUrl);
-    } catch (e) {}
-    try {
-      await fetch('/api/profile', {
+      const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ field: 'profile_photo', value: photoUrl }),
       });
-    } catch (e) { console.error('Error saving profile photo:', e); }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Server status ${res.status}`);
+      }
+      return { success: true };
+    } catch (e) {
+      console.error('Error saving profile photo to DB:', e);
+      throw e;
+    }
   };
 
   // Bio update
   const updateBio = async (bio1, bio2) => {
     const newBio = { bio1, bio2 };
     setProfileBio(newBio);
-    localStorage.setItem('ferdy_profile_bio', JSON.stringify(newBio));
+    safeSetItem('ferdy_profile_bio', JSON.stringify(newBio));
     try {
-      await Promise.all([
+      const [r1, r2] = await Promise.all([
         fetch('/api/profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ field: 'bio1', value: bio1 }) }),
         fetch('/api/profile', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ field: 'bio2', value: bio2 }) }),
       ]);
-    } catch (e) { console.error('Error saving bio:', e); }
+      if (!r1.ok || !r2.ok) {
+        throw new Error('Gagal menyimpan bio ke server');
+      }
+      return { success: true };
+    } catch (e) {
+      console.error('Error saving bio:', e);
+      throw e;
+    }
   };
 
   // Gallery photos update
   const saveGalleryPhotos = async (photos) => {
     setGalleryPhotos(photos);
-    localStorage.setItem('ferdy_gallery_photos', JSON.stringify(photos));
+    safeSetItem('ferdy_gallery_photos', JSON.stringify(photos));
     try {
-      await fetch('/api/profile', {
+      const res = await fetch('/api/profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ field: 'gallery_photos', value: photos }),
       });
-    } catch (e) { console.error('Error saving gallery:', e); }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Server status ${res.status}`);
+      }
+      return { success: true };
+    } catch (e) {
+      console.error('Error saving gallery:', e);
+      throw e;
+    }
   };
 
   // Auth (MongoDB + LocalStorage fallback)

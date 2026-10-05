@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { usePortfolio } from '../context/PortfolioContext';
-import { Shield, Plus, Edit2, Trash2, Key, FolderKanban, BookOpen, Wrench, ArrowLeft, Check, AlertCircle, User, Image, FileText } from 'lucide-react';
+import { Shield, Plus, Edit2, Trash2, Key, FolderKanban, BookOpen, Wrench, ArrowLeft, Check, AlertCircle, User, Image, FileText, Loader2 } from 'lucide-react';
+import { compressImageFile, formatGoogleDriveUrl } from '../utils/imageCompressor';
 
 export const AdminPage = () => {
   const {
@@ -34,6 +35,7 @@ export const AdminPage = () => {
   const [bioForm, setBioForm] = useState({ bio1: '', bio2: '' });
   const [bioEditMode, setBioEditMode] = useState(false);
   const [newGalleryUrl, setNewGalleryUrl] = useState('');
+  const [photoUploading, setPhotoUploading] = useState(false);
 
   // PROJECT FORM STATE
   const [pEditId, setPEditId] = useState(null);
@@ -987,49 +989,78 @@ export const AdminPage = () => {
                 <User className="w-4 h-4 text-sky-400" /> Foto Profil (About)
               </h2>
               <div className="flex flex-col sm:flex-row gap-6 items-start">
-                <img
-                  src={aboutPhoto}
-                  alt="Foto Profil"
-                  className="w-28 h-28 rounded-2xl object-cover border border-white/20 shrink-0"
-                />
+                <div className="relative shrink-0">
+                  <img
+                    src={aboutPhoto}
+                    alt="Foto Profil"
+                    className="w-28 h-28 rounded-2xl object-cover border border-white/20"
+                  />
+                  {photoUploading && (
+                    <div className="absolute inset-0 bg-black/70 rounded-2xl flex flex-col items-center justify-center text-white text-xs gap-1">
+                      <Loader2 className="w-6 h-6 animate-spin text-sky-400" />
+                      <span>Menyimpan...</span>
+                    </div>
+                  )}
+                </div>
                 <div className="flex-1 space-y-3">
                   <div>
-                    <label className="text-xs text-white/50 block mb-1">Upload Foto dari HP / Galeri</label>
+                    <label className="text-xs text-white/50 block mb-1">Upload Foto dari HP / Galeri (Otomatis Kompres & Cepat)</label>
                     <input
                       type="file"
                       accept="image/*"
-                      onChange={(e) => {
+                      disabled={photoUploading}
+                      onChange={async (e) => {
                         const file = e.target.files?.[0];
                         if (!file) return;
-                        const reader = new FileReader();
-                        reader.onload = async (ev) => {
-                          await updateAboutPhoto(ev.target.result);
-                          flashMessage('Foto profil berhasil diperbarui!');
-                        };
-                        reader.readAsDataURL(file);
+                        setPhotoUploading(true);
+                        try {
+                          flashMessage('Mengompres foto profil...');
+                          const compressed = await compressImageFile(file, 1000, 1000, 0.82);
+                          flashMessage('Menyimpan ke database...');
+                          await updateAboutPhoto(compressed);
+                          flashMessage('✅ Foto profil berhasil disimpan permanen!');
+                        } catch (err) {
+                          alert(`Gagal menyimpan foto: ${err.message}`);
+                          flashMessage('❌ Gagal menyimpan foto');
+                        } finally {
+                          setPhotoUploading(false);
+                          e.target.value = '';
+                        }
                       }}
                       className="w-full text-xs text-white/60 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer"
                     />
                   </div>
                   <div>
-                    <label className="text-xs text-white/50 block mb-1">Atau masukkan URL foto</label>
+                    <label className="text-xs text-white/50 block mb-1">Atau masukkan URL foto (Google Drive / link langsung)</label>
                     <div className="flex gap-2">
                       <input
                         type="url"
                         placeholder="https://drive.google.com/... atau link foto"
                         id="photoUrlInput"
+                        disabled={photoUploading}
                         className="flex-1 rounded-xl bg-black/50 border border-white/10 px-3.5 py-2.5 text-sm text-white outline-none focus:border-white"
                       />
                       <button
                         type="button"
+                        disabled={photoUploading}
                         onClick={async () => {
-                          const url = document.getElementById('photoUrlInput').value.trim();
-                          if (!url) return;
-                          await updateAboutPhoto(url);
-                          document.getElementById('photoUrlInput').value = '';
-                          flashMessage('Foto profil diperbarui!');
+                          const inputEl = document.getElementById('photoUrlInput');
+                          const rawUrl = inputEl?.value?.trim();
+                          if (!rawUrl) return;
+                          setPhotoUploading(true);
+                          try {
+                            const formatted = formatGoogleDriveUrl(rawUrl);
+                            flashMessage('Menyimpan foto...');
+                            await updateAboutPhoto(formatted);
+                            inputEl.value = '';
+                            flashMessage('✅ Foto profil berhasil disimpan!');
+                          } catch (err) {
+                            alert(`Gagal menyimpan foto: ${err.message}`);
+                          } finally {
+                            setPhotoUploading(false);
+                          }
                         }}
-                        className="px-4 py-2.5 rounded-xl bg-white text-black text-xs font-black uppercase hover:bg-white/90 transition-all"
+                        className="px-4 py-2.5 rounded-xl bg-white text-black text-xs font-black uppercase hover:bg-white/90 transition-all disabled:opacity-50"
                       >
                         Simpan
                       </button>
@@ -1109,26 +1140,31 @@ export const AdminPage = () => {
               {/* Add new photo */}
               <div className="space-y-3 mb-6">
                 <div>
-                  <label className="text-xs text-white/50 block mb-1">Upload Foto Baru dari HP</label>
+                  <label className="text-xs text-white/50 block mb-1">Upload Foto Baru dari HP (Otomatis Kompres & Cepat)</label>
                   <input
                     type="file"
                     accept="image/*"
                     multiple
-                    onChange={(e) => {
+                    disabled={photoUploading}
+                    onChange={async (e) => {
                       const files = e.target.files;
                       if (!files || !files.length) return;
-                      const readers = Array.from(files).map(
-                        (file) => new Promise((resolve) => {
-                          const r = new FileReader();
-                          r.onload = (ev) => resolve(ev.target.result);
-                          r.readAsDataURL(file);
-                        })
-                      );
-                      Promise.all(readers).then(async (newPhotos) => {
-                        const updated = [...galleryPhotos, ...newPhotos];
+                      setPhotoUploading(true);
+                      try {
+                        flashMessage(`Mengompres ${files.length} foto...`);
+                        const compressedList = await Promise.all(
+                          Array.from(files).map((f) => compressImageFile(f, 1000, 800, 0.8))
+                        );
+                        flashMessage('Menyimpan ke database...');
+                        const updated = [...galleryPhotos, ...compressedList];
                         await saveGalleryPhotos(updated);
-                        flashMessage(`${newPhotos.length} foto galeri ditambahkan!`);
-                      });
+                        flashMessage(`✅ ${compressedList.length} foto galeri berhasil ditambahkan!`);
+                      } catch (err) {
+                        alert(`Gagal menyimpan foto galeri: ${err.message}`);
+                      } finally {
+                        setPhotoUploading(false);
+                        e.target.value = '';
+                      }
                     }}
                     className="w-full text-xs text-white/60 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20 cursor-pointer"
                   />
@@ -1140,19 +1176,29 @@ export const AdminPage = () => {
                       type="url"
                       placeholder="https://... link foto proyek kamu"
                       value={newGalleryUrl}
+                      disabled={photoUploading}
                       onChange={(e) => setNewGalleryUrl(e.target.value)}
                       className="flex-1 rounded-xl bg-black/50 border border-white/10 px-3.5 py-2.5 text-sm text-white outline-none focus:border-white"
                     />
                     <button
                       type="button"
+                      disabled={photoUploading}
                       onClick={async () => {
                         if (!newGalleryUrl.trim()) return;
-                        const updated = [...galleryPhotos, newGalleryUrl.trim()];
-                        await saveGalleryPhotos(updated);
-                        setNewGalleryUrl('');
-                        flashMessage('Foto galeri ditambahkan!');
+                        setPhotoUploading(true);
+                        try {
+                          const formatted = formatGoogleDriveUrl(newGalleryUrl.trim());
+                          const updated = [...galleryPhotos, formatted];
+                          await saveGalleryPhotos(updated);
+                          setNewGalleryUrl('');
+                          flashMessage('✅ Foto galeri ditambahkan!');
+                        } catch (err) {
+                          alert(`Gagal menambah foto: ${err.message}`);
+                        } finally {
+                          setPhotoUploading(false);
+                        }
                       }}
-                      className="px-4 py-2.5 rounded-xl bg-white text-black text-xs font-black uppercase hover:bg-white/90 transition-all"
+                      className="px-4 py-2.5 rounded-xl bg-white text-black text-xs font-black uppercase hover:bg-white/90 transition-all disabled:opacity-50"
                     >
                       Tambah
                     </button>
