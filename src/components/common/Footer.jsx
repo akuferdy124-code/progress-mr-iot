@@ -12,7 +12,7 @@ export const Footer = () => {
     {
       name: 'WhatsApp',
       icon: <MessageCircle className="w-4 h-4 text-emerald-400 group-hover:text-black transition-colors" />,
-      href: 'https://wa.me/6283874535719',
+      href: 'https://wa.me/6283874536719',
     },
     {
       name: 'Instagram',
@@ -60,7 +60,7 @@ export const Footer = () => {
 
         <div className="flex flex-col items-start md:items-end gap-3 shrink-0">
           <a
-            href="https://wa.me/6283874535719"
+            href="https://wa.me/6283874536719"
             target="_blank"
             rel="noreferrer"
             className="rounded-full px-8 py-3.5 sm:px-10 sm:py-4 text-xs sm:text-sm font-black text-black bg-white uppercase tracking-widest inline-block text-center hover:scale-105 hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] transition-all duration-200"
